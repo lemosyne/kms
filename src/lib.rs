@@ -20,7 +20,7 @@ pub trait KeyManagementScheme {
     /// be deferred, but must be guaranteed after calling `commit()`.
     fn update(&mut self, key: Self::KeyId) -> Self::Key;
 
-    /// Commits any deferred key updates, making all udpated keys truly underivable from `self`.
+    /// Commits any deferred key updates, making all updated keys truly underivable from `self`.
     fn commit(&mut self);
 
     /// Compacts the internal state of `self`.
