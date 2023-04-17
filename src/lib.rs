@@ -42,16 +42,40 @@ pub trait KeyManagementScheme {
         keys.into_iter().map(|key| self.update(key)).collect()
     }
 
-    /// Commits any deferred key updates. making all updated keys truly underivable from `self`.
+    /// Commits any deferred key updates, guaranteeing their revocation from `self`.
+    ///
+    /// This can be a no-op for schemes that don't implement `DeferredKeyManagementScheme`.
     fn commit(&mut self);
 
     /// Compacts the internal state of `self`.
+    ///
+    /// This can be a no-op for schemes that do not or cannot compact internal state.
     fn compact(&mut self);
 
-    /// Persists state to some writable location.
-    fn persist<W>(&self, location: W) -> Result<(), Self::Error>
+    /// Persists public state to some writable location.
+    ///
+    /// Public state is any data that does not need to be securely deleted.
+    fn persist_public_state<W>(&self, loc: W) -> Result<(), Self::Error>
     where
         W: std::io::Write;
+
+    /// Persists private state to some writeable location.
+    ///
+    /// Private state is any data that must be securely deleted.
+    fn persist_private_state<W>(&self, loc: W) -> Result<(), Self::Error>
+    where
+        W: std::io::Write;
+
+    /// Persists public and private state to their respective locations.
+    fn persist<V, W>(&self, pub_loc: V, priv_loc: W) -> Result<(), Self::Error>
+    where
+        V: std::io::Write,
+        W: std::io::Write,
+    {
+        self.persist_public_state(pub_loc)?;
+        self.persist_private_state(priv_loc)?;
+        Ok(())
+    }
 }
 
 /// A marker trait used to indicate that a `KeyManagementScheme` implementation is secure.
