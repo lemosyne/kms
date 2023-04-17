@@ -16,9 +16,27 @@ pub trait KeyManagementScheme {
     /// updates to that `KeyId`.
     fn derive(&mut self, key: Self::KeyId) -> Self::Key;
 
+    /// Derives the keys corresponding to the given `KeyId`s. These keys should not be kept beyond
+    /// any updates to their respective `KeyId`s.
+    fn derive_many<I>(&mut self, keys: I) -> Vec<Self::Key>
+    where
+        I: IntoIterator<Item = Self::KeyId>,
+    {
+        keys.into_iter().map(|key| self.derive(key)).collect()
+    }
+
     /// Update the key corresponding to the given `KeyId`. The actual revocation of the old key can
     /// be deferred, but must be guaranteed after calling `commit()`.
     fn update(&mut self, key: Self::KeyId) -> Self::Key;
+
+    /// Updates the keys corresponding to the given `KeyId`s. The actual revocation of the old keys
+    /// can be deferred, but must be guaranteed after calling `commit()`.
+    fn update_many<I>(&mut self, keys: I) -> Vec<Self::Key>
+    where
+        I: IntoIterator<Item = Self::KeyId>,
+    {
+        keys.into_iter().map(|key| self.update(key)).collect()
+    }
 
     /// Commits any deferred key updates, making all updated keys truly underivable from `self`.
     fn commit(&mut self);
