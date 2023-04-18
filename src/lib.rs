@@ -78,17 +78,17 @@ pub trait KeyManagementScheme {
     }
 
     /// Loads public state from some readable location.
-    fn load_public_state<R>(&self, loc: &mut R) -> Result<(), Self::Error>
+    fn load_public_state<R>(&mut self, loc: &mut R) -> Result<(), Self::Error>
     where
         R: std::io::Read;
 
     /// Loads private state from some readable location.
-    fn load_private_state<R>(&self, loc: &mut R) -> Result<(), Self::Error>
+    fn load_private_state<R>(&mut self, loc: &mut R) -> Result<(), Self::Error>
     where
         R: std::io::Read;
 
     /// Loads public and private from their respective locations.
-    fn load<Q, R>(&self, pub_loc: &mut Q, priv_loc: &mut R) -> Result<(), Self::Error>
+    fn load<Q, R>(&mut self, pub_loc: &mut Q, priv_loc: &mut R) -> Result<(), Self::Error>
     where
         Q: std::io::Read,
         R: std::io::Read,
