@@ -8,6 +8,10 @@ pub trait KeyManagementScheme {
     type KeyId;
     /// The associated error for fallible operations (e.g. `persist()`).
     type Error;
+    /// Metadata needed when persisting or loading public state.
+    type PublicMetadata;
+    /// Metadata needed when persisting or loading private state.
+    type PrivateMetadata;
 
     /// Sets up and returns the key management scheme.
     fn setup(init: Self::Init) -> Self;
@@ -55,46 +59,74 @@ pub trait KeyManagementScheme {
     /// Persists public state to some writable location.
     ///
     /// Public state is any data that does not need to be securely deleted.
-    fn persist_public_state<W>(&self, loc: &mut W) -> Result<(), Self::Error>
+    fn persist_public_state<W>(
+        &self,
+        loc: &mut W,
+        meta: Self::PublicMetadata,
+    ) -> Result<(), Self::Error>
     where
         W: std::io::Write;
 
     /// Persists private state to some writeable location.
     ///
     /// Private state is any data that must be securely deleted.
-    fn persist_private_state<W>(&self, loc: &mut W) -> Result<(), Self::Error>
+    fn persist_private_state<W>(
+        &self,
+        loc: &mut W,
+        meta: Self::PrivateMetadata,
+    ) -> Result<(), Self::Error>
     where
         W: std::io::Write;
 
     /// Persists public and private state to their respective locations.
-    fn persist<V, W>(&self, pub_loc: &mut V, priv_loc: &mut W) -> Result<(), Self::Error>
+    fn persist<V, W>(
+        &self,
+        pub_loc: &mut V,
+        pub_meta: Self::PublicMetadata,
+        priv_loc: &mut W,
+        priv_meta: Self::PrivateMetadata,
+    ) -> Result<(), Self::Error>
     where
         V: std::io::Write,
         W: std::io::Write,
     {
-        self.persist_public_state(pub_loc)?;
-        self.persist_private_state(priv_loc)?;
+        self.persist_public_state(pub_loc, pub_meta)?;
+        self.persist_private_state(priv_loc, priv_meta)?;
         Ok(())
     }
 
     /// Loads public state from some readable location.
-    fn load_public_state<R>(&mut self, loc: &mut R) -> Result<(), Self::Error>
+    fn load_public_state<R>(
+        &mut self,
+        loc: &mut R,
+        meta: Self::PublicMetadata,
+    ) -> Result<(), Self::Error>
     where
         R: std::io::Read;
 
     /// Loads private state from some readable location.
-    fn load_private_state<R>(&mut self, loc: &mut R) -> Result<(), Self::Error>
+    fn load_private_state<R>(
+        &mut self,
+        loc: &mut R,
+        meta: Self::PrivateMetadata,
+    ) -> Result<(), Self::Error>
     where
         R: std::io::Read;
 
     /// Loads public and private from their respective locations.
-    fn load<Q, R>(&mut self, pub_loc: &mut Q, priv_loc: &mut R) -> Result<(), Self::Error>
+    fn load<Q, R>(
+        &mut self,
+        pub_loc: &mut Q,
+        pub_meta: Self::PublicMetadata,
+        priv_loc: &mut R,
+        priv_meta: Self::PrivateMetadata,
+    ) -> Result<(), Self::Error>
     where
         Q: std::io::Read,
         R: std::io::Read,
     {
-        self.load_private_state(priv_loc)?;
-        self.load_public_state(pub_loc)?;
+        self.load_private_state(priv_loc, priv_meta)?;
+        self.load_public_state(pub_loc, pub_meta)?;
         Ok(())
     }
 }
