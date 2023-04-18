@@ -4,14 +4,14 @@ pub trait KeyManagementScheme {
     type Init;
     /// The type of a key.
     type Key;
-    /// The type used to act as key identifiers (e.g., `u64` or `usize`).
+    /// The type used to act as key identifiers.
     type KeyId;
     /// The associated error for fallible operations (e.g. `persist()`).
     type Error;
-    /// Metadata needed when persisting or loading public state.
-    type PublicMetadata;
-    /// Metadata needed when persisting or loading private state.
-    type PrivateMetadata;
+    /// Parameters for persisting or loading public state.
+    type PublicParams;
+    /// Parameters for persisting or loading private state.
+    type PrivateParams;
 
     /// Sets up and returns the key management scheme.
     fn setup(init: Self::Init) -> Self;
@@ -56,77 +56,41 @@ pub trait KeyManagementScheme {
     /// This can be a no-op for schemes that do not or cannot compact internal state.
     fn compact(&mut self);
 
-    /// Persists public state to some writable location.
+    /// Persists public state.
     ///
     /// Public state is any data that does not need to be securely deleted.
-    fn persist_public_state<W>(
-        &self,
-        loc: &mut W,
-        meta: Self::PublicMetadata,
-    ) -> Result<(), Self::Error>
-    where
-        W: std::io::Write;
+    fn persist_public_state(&self, params: Self::PublicParams) -> Result<(), Self::Error>;
 
-    /// Persists private state to some writeable location.
+    /// Persists private state.
     ///
     /// Private state is any data that must be securely deleted.
-    fn persist_private_state<W>(
-        &self,
-        loc: &mut W,
-        meta: Self::PrivateMetadata,
-    ) -> Result<(), Self::Error>
-    where
-        W: std::io::Write;
+    fn persist_private_state(&self, params: Self::PrivateParams) -> Result<(), Self::Error>;
 
     /// Persists public and private state to their respective locations.
-    fn persist<V, W>(
+    fn persist(
         &self,
-        pub_loc: &mut V,
-        pub_meta: Self::PublicMetadata,
-        priv_loc: &mut W,
-        priv_meta: Self::PrivateMetadata,
-    ) -> Result<(), Self::Error>
-    where
-        V: std::io::Write,
-        W: std::io::Write,
-    {
-        self.persist_public_state(pub_loc, pub_meta)?;
-        self.persist_private_state(priv_loc, priv_meta)?;
+        pub_params: Self::PublicParams,
+        priv_params: Self::PrivateParams,
+    ) -> Result<(), Self::Error> {
+        self.persist_public_state(pub_params)?;
+        self.persist_private_state(priv_params)?;
         Ok(())
     }
 
     /// Loads public state from some readable location.
-    fn load_public_state<R>(
-        &mut self,
-        loc: &mut R,
-        meta: Self::PublicMetadata,
-    ) -> Result<(), Self::Error>
-    where
-        R: std::io::Read;
+    fn load_public_state(&mut self, params: Self::PublicParams) -> Result<(), Self::Error>;
 
     /// Loads private state from some readable location.
-    fn load_private_state<R>(
-        &mut self,
-        loc: &mut R,
-        meta: Self::PrivateMetadata,
-    ) -> Result<(), Self::Error>
-    where
-        R: std::io::Read;
+    fn load_private_state(&mut self, params: Self::PrivateParams) -> Result<(), Self::Error>;
 
     /// Loads public and private from their respective locations.
-    fn load<Q, R>(
+    fn load(
         &mut self,
-        pub_loc: &mut Q,
-        pub_meta: Self::PublicMetadata,
-        priv_loc: &mut R,
-        priv_meta: Self::PrivateMetadata,
-    ) -> Result<(), Self::Error>
-    where
-        Q: std::io::Read,
-        R: std::io::Read,
-    {
-        self.load_private_state(priv_loc, priv_meta)?;
-        self.load_public_state(pub_loc, pub_meta)?;
+        pub_params: Self::PublicParams,
+        priv_params: Self::PrivateParams,
+    ) -> Result<(), Self::Error> {
+        self.load_private_state(priv_params)?;
+        self.load_public_state(pub_params)?;
         Ok(())
     }
 }
