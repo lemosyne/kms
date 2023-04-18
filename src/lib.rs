@@ -55,19 +55,19 @@ pub trait KeyManagementScheme {
     /// Persists public state to some writable location.
     ///
     /// Public state is any data that does not need to be securely deleted.
-    fn persist_public_state<W>(&self, loc: W) -> Result<(), Self::Error>
+    fn persist_public_state<W>(&self, loc: &mut W) -> Result<(), Self::Error>
     where
         W: std::io::Write;
 
     /// Persists private state to some writeable location.
     ///
     /// Private state is any data that must be securely deleted.
-    fn persist_private_state<W>(&self, loc: W) -> Result<(), Self::Error>
+    fn persist_private_state<W>(&self, loc: &mut W) -> Result<(), Self::Error>
     where
         W: std::io::Write;
 
     /// Persists public and private state to their respective locations.
-    fn persist<V, W>(&self, pub_loc: V, priv_loc: W) -> Result<(), Self::Error>
+    fn persist<V, W>(&self, pub_loc: &mut V, priv_loc: &mut W) -> Result<(), Self::Error>
     where
         V: std::io::Write,
         W: std::io::Write,
