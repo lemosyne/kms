@@ -14,7 +14,9 @@ pub trait KeyManagementScheme {
     type PrivateParams;
 
     /// Sets up and returns the key management scheme.
-    fn setup(init: Self::Init) -> Self;
+    fn setup(init: Self::Init) -> Result<Self, Self::Error>
+    where
+        Self: Sized;
 
     /// Derive the key corresponding to the given `KeyId`.
     ///
