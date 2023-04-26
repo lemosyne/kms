@@ -61,16 +61,16 @@ pub trait KeyManagementScheme {
     /// Persists public state.
     ///
     /// Public state is any data that does not need to be securely deleted.
-    fn persist_public_state(&self, params: Self::PublicParams) -> Result<(), Self::Error>;
+    fn persist_public_state(&mut self, params: Self::PublicParams) -> Result<(), Self::Error>;
 
     /// Persists private state.
     ///
     /// Private state is any data that must be securely deleted.
-    fn persist_private_state(&self, params: Self::PrivateParams) -> Result<(), Self::Error>;
+    fn persist_private_state(&mut self, params: Self::PrivateParams) -> Result<(), Self::Error>;
 
     /// Persists public and private state to their respective locations.
     fn persist(
-        &self,
+        &mut self,
         pub_params: Self::PublicParams,
         priv_params: Self::PrivateParams,
     ) -> Result<(), Self::Error> {
