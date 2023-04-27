@@ -21,12 +21,12 @@ pub trait KeyManagementScheme {
     /// Derive the key corresponding to the given `KeyId`.
     ///
     /// This key should not be kept beyond any updates to that `KeyId`.
-    fn derive(&mut self, key: Self::KeyId) -> Self::Key;
+    fn derive(&mut self, key: Self::KeyId) -> Result<Self::Key, Self::Error>;
 
     /// Derives the keys corresponding to the given `KeyId`s.
     ///
     /// These keys should not be kept beyond any updates to their respective `KeyId`s.
-    fn derive_many<I>(&mut self, keys: I) -> Vec<Self::Key>
+    fn derive_many<I>(&mut self, keys: I) -> Vec<Result<Self::Key, Self::Error>>
     where
         I: IntoIterator<Item = Self::KeyId>,
     {
@@ -36,12 +36,12 @@ pub trait KeyManagementScheme {
     /// Update the key corresponding to the given `KeyId`.
     ///
     /// Revocation of the old key is only guaranteed after calling `commit()`.
-    fn update(&mut self, key: Self::KeyId) -> Self::Key;
+    fn update(&mut self, key: Self::KeyId) -> Result<Self::Key, Self::Error>;
 
     /// Updates the keys corresponding to the given `KeyId`s.
     ///
     /// Revocation of the old keys is only guaranteed after calling `commit()`.
-    fn update_many<I>(&mut self, keys: I) -> Vec<Self::Key>
+    fn update_many<I>(&mut self, keys: I) -> Vec<Result<Self::Key, Self::Error>>
     where
         I: IntoIterator<Item = Self::KeyId>,
     {
