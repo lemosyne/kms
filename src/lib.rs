@@ -1,4 +1,4 @@
-use embedded_io::blocking::{Read, Seek, Write};
+use embedded_io::blocking::{Read, Write};
 
 /// A trait describing the basic functionality of a key management scheme.
 pub trait KeyManagementScheme {
@@ -24,9 +24,11 @@ pub trait KeyManagementScheme {
     fn commit(&mut self) -> Vec<Self::KeyId>;
 }
 
-pub trait Persist<IO: Read + Write + Seek>: Sized {
+/// TODO: Add documentation.
+pub trait Persist<IO: Read + Write>: Sized {
     type Init;
 
     fn persist(&self, sink: IO) -> Result<(), IO::Error>;
+
     fn load(&self, init: Self::Init, source: IO) -> Result<Self, IO::Error>;
 }
