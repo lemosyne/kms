@@ -21,10 +21,12 @@ pub trait KeyManagementScheme {
 
     /// Commits any deferred key updates, guaranteeing their revocation from `self`,
     /// assuming that all keys which persisted `self` in the past are securely deleted.
-    fn commit(&mut self);
+    fn commit(&mut self) -> Vec<Self::KeyId>;
 }
 
 pub trait Persist<IO: Read + Write + Seek>: Sized {
+    type Init;
+
     fn persist(&self, sink: IO) -> Result<(), IO::Error>;
-    fn load(&self, source: IO) -> Result<Self, IO::Error>;
+    fn load(&self, init: Self::Init, source: IO) -> Result<Self, IO::Error>;
 }
