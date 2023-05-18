@@ -1,3 +1,4 @@
+use core::fmt::Debug;
 use embedded_io::blocking::{Read, Write};
 
 /// A trait describing the basic functionality of a key management scheme.
@@ -7,7 +8,7 @@ pub trait KeyManagementScheme {
     /// The type used to act as key identifiers.
     type KeyId;
     /// The associated error for fallible operations (e.g. `persist()`).
-    type Error;
+    type Error: Debug;
 
     /// Derive the key corresponding to the given `KeyId`.
     ///
@@ -28,7 +29,7 @@ pub trait KeyManagementScheme {
 pub trait Persist<IO: Read + Write>: Sized {
     type Init;
 
-    fn persist(&self, sink: IO) -> Result<(), IO::Error>;
+    fn persist(&mut self, sink: IO) -> Result<(), IO::Error>;
 
-    fn load(&self, init: Self::Init, source: IO) -> Result<Self, IO::Error>;
+    fn load(init: Self::Init, source: IO) -> Result<Self, IO::Error>;
 }
