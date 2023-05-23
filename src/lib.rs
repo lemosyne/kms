@@ -1,5 +1,4 @@
 use core::fmt::Debug;
-use embedded_io::blocking::{Read, Write};
 
 /// A trait describing the basic functionality of a key management scheme.
 pub trait KeyManagementScheme {
@@ -23,13 +22,4 @@ pub trait KeyManagementScheme {
     /// Commits any deferred key updates, guaranteeing their revocation from `self`,
     /// assuming that all keys which persisted `self` in the past are securely deleted.
     fn commit(&mut self) -> Vec<Self::KeyId>;
-}
-
-/// TODO: Add documentation.
-pub trait Persist<IO: Read + Write>: Sized {
-    type Init;
-
-    fn persist(&mut self, sink: IO) -> Result<(), IO::Error>;
-
-    fn load(init: Self::Init, source: IO) -> Result<Self, IO::Error>;
 }
