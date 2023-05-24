@@ -29,35 +29,25 @@ use inachus::IoGenerator;
 
 #[cfg(feature = "persistence")]
 /// A trait describing the basic functionality of a persisted key management scheme.
-pub trait PersistedKeyManagementScheme {
+pub trait PersistedKeyManagementScheme<IoG: IoGenerator> {
     /// The type of a key.
     type Key;
     /// The type used to act as key identifiers.
     type KeyId;
     /// The associated error for fallible operations (e.g. `persist()`).
     type Error: Debug;
-    /// The associated IO generator.
-    type IoGenerator: IoGenerator;
 
     /// Derive the key corresponding to the given `KeyId`.
     ///
     /// This key should not be kept beyond any updates to that `KeyId`.
-    fn derive(
-        &mut self,
-        iog: &mut Self::IoGenerator,
-        key: Self::KeyId,
-    ) -> Result<Self::Key, Self::Error>;
+    fn derive(&mut self, iog: &mut IoG, key: Self::KeyId) -> Result<Self::Key, Self::Error>;
 
     /// Update the key corresponding to the given `KeyId`.
     ///
     /// Revocation of the old key is only guaranteed after calling `commit()`.
-    fn update(
-        &mut self,
-        iog: &mut Self::IoGenerator,
-        key: Self::KeyId,
-    ) -> Result<Self::Key, Self::Error>;
+    fn update(&mut self, iog: &mut IoG, key: Self::KeyId) -> Result<Self::Key, Self::Error>;
 
     /// Commits any deferred key updates, guaranteeing their revocation from `self`,
     /// assuming that all keys which persisted `self` in the past are securely deleted.
-    fn commit(&mut self, iog: &mut Self::IoGenerator) -> Vec<Self::KeyId>;
+    fn commit(&mut self, iog: &mut IoG) -> Vec<Self::KeyId>;
 }
