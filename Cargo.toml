@@ -2,3 +2,9 @@
 name = "kms"
 version = "0.1.0"
 edition = "2021"
+
+[dependencies]
+inachus = { git = "ssh://git@github.com/lemosyne/inachus.git", optional = true }
+
+[features]
+persistence = ["dep:inachus"]
