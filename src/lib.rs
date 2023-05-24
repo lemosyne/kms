@@ -42,7 +42,7 @@ pub trait PersistedKeyManagementScheme {
     /// Derive the key corresponding to the given `KeyId`.
     ///
     /// This key should not be kept beyond any updates to that `KeyId`.
-    fn derive<IoG>(
+    fn derive(
         &mut self,
         iog: &mut Self::IoGenerator,
         key: Self::KeyId,
@@ -51,7 +51,7 @@ pub trait PersistedKeyManagementScheme {
     /// Update the key corresponding to the given `KeyId`.
     ///
     /// Revocation of the old key is only guaranteed after calling `commit()`.
-    fn update<IoG>(
+    fn update(
         &mut self,
         iog: &mut Self::IoGenerator,
         key: Self::KeyId,
