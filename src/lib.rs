@@ -8,6 +8,8 @@ pub trait KeyManagementScheme {
     type KeyId;
     /// The associated error for fallible operations (e.g. `persist()`).
     type Error: Debug;
+    /// The additional state needed for commit.
+    type CommitState;
 
     /// Derive the key corresponding to the given `KeyId`.
     ///
@@ -21,7 +23,7 @@ pub trait KeyManagementScheme {
 
     /// Commits any deferred key updates, guaranteeing their revocation from `self`,
     /// assuming that all keys which persisted `self` in the past are securely deleted.
-    fn commit(&mut self) -> Vec<Self::KeyId>;
+    fn commit(&mut self, state: CommitState) -> Vec<Self::KeyId>;
 }
 
 #[cfg(feature = "persistence")]
