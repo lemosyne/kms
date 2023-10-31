@@ -1,7 +1,9 @@
 use core::fmt::Debug;
 
+use rand::{CryptoRng, RngCore};
+
 /// A trait describing the basic functionality of a key management scheme.
-pub trait KeyManagementScheme<S> {
+pub trait KeyManagementScheme {
     /// The type of a key.
     type Key;
     /// The type used to act as key identifiers.
@@ -21,5 +23,5 @@ pub trait KeyManagementScheme<S> {
 
     /// Commits any deferred key updates, guaranteeing their revocation from `self`,
     /// assuming that all keys which persisted `self` in the past are securely deleted.
-    fn commit(&mut self, state: S) -> Vec<Self::KeyId>;
+    fn commit(&mut self, rng: impl RngCore + CryptoRng) -> Vec<Self::KeyId>;
 }
