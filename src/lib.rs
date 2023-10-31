@@ -1,15 +1,13 @@
 use core::fmt::Debug;
 
 /// A trait describing the basic functionality of a key management scheme.
-pub trait KeyManagementScheme {
+pub trait KeyManagementScheme<S> {
     /// The type of a key.
     type Key;
     /// The type used to act as key identifiers.
     type KeyId;
     /// The associated error for fallible operations (e.g. `persist()`).
     type Error: Debug;
-    /// The additional state needed for commit.
-    type CommitState;
 
     /// Derive the key corresponding to the given `KeyId`.
     ///
@@ -23,5 +21,5 @@ pub trait KeyManagementScheme {
 
     /// Commits any deferred key updates, guaranteeing their revocation from `self`,
     /// assuming that all keys which persisted `self` in the past are securely deleted.
-    fn commit(&mut self, state: Self::CommitState) -> Vec<Self::KeyId>;
+    fn commit(&mut self, state: S) -> Vec<Self::KeyId>;
 }
