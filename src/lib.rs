@@ -23,5 +23,8 @@ pub trait KeyManagementScheme {
 
     /// Commits any deferred key updates, guaranteeing their revocation from `self`,
     /// assuming that all keys which persisted `self` in the past are securely deleted.
-    fn commit(&mut self, rng: impl RngCore + CryptoRng) -> Vec<Self::KeyId>;
+    fn commit(
+        &mut self,
+        rng: impl RngCore + CryptoRng,
+    ) -> Result<Vec<(Self::KeyId, Self::Key)>, Self::Error>;
 }
