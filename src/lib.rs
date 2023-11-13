@@ -7,7 +7,7 @@ pub trait KeyManagementScheme {
     /// The type used to act as key identifiers.
     type KeyId;
     /// The associated error for fallible operations (e.g. `persist()`).
-    type Error: std::error::Error;
+    type Error: std::error::Error + core::fmt::Debug;
 
     /// Derive the key corresponding to the given `KeyId`.
     ///
