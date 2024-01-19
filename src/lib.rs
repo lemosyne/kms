@@ -1,3 +1,5 @@
+use core::fmt::Debug;
+
 use rand::{CryptoRng, RngCore};
 
 /// A trait describing the basic functionality of a key management scheme.
@@ -7,7 +9,7 @@ pub trait KeyManagementScheme {
     /// The type used to act as key identifiers.
     type KeyId;
     /// The associated error for fallible operations (e.g. `persist()`).
-    type Error: std::error::Error;
+    type Error: Debug;
 
     /// Derive the key corresponding to the given `KeyId`.
     ///
